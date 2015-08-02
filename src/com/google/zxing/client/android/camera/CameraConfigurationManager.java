@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.google.zxing.client.android.QRcodeConfig;
 import com.google.zxing.client.android.PreferencesActivity;
 
 /**
@@ -78,8 +79,8 @@ final class CameraConfigurationManager {
 
     CameraConfigurationUtils.setFocus(
         parameters,
-        prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true),
-        prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true),
+        QRcodeConfig.KEY_AUTO_FOCUS,
+        QRcodeConfig.KEY_DISABLE_CONTINUOUS_FOCUS,
         safeMode);
 
     if (!safeMode) {
@@ -103,6 +104,7 @@ final class CameraConfigurationManager {
 
     Log.i(TAG, "Final camera parameters: " + parameters.flatten());
 
+    camera.setDisplayOrientation(90);
     camera.setParameters(parameters);
 
     Camera.Parameters afterParameters = camera.getParameters();

@@ -16,9 +16,6 @@
 
 package com.google.zxing.client.android.encode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,23 +26,17 @@ import java.util.Map;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
-import android.util.Log;
 import cn.feng.barcode.R;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.Result;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.result.AddressBookParsedResult;
-import com.google.zxing.client.result.ParsedResult;
-import com.google.zxing.client.result.ResultParser;
 import com.google.zxing.common.BitMatrix;
 
 /**
@@ -130,12 +121,7 @@ final class QRCodeEncoder {
 
   // Handles send intents from multitude of Android applications
   private void encodeContentsFromShareIntent(Intent intent) throws WriterException {
-    // Check if this is a plain text encoding, or contact
-    if (intent.hasExtra(Intent.EXTRA_STREAM)) {
-      encodeFromStreamExtra(intent);
-    } else {
       encodeFromTextExtras(intent);
-    }
   }
 
   private void encodeFromTextExtras(Intent intent) throws WriterException {
@@ -172,57 +158,6 @@ final class QRCodeEncoder {
       displayContents = contents;
     }
     title = activity.getString(R.string.contents_text);
-  }
-
-  // Handles send intents from the Contacts app, retrieving a contact as a VCARD.
-  private void encodeFromStreamExtra(Intent intent) throws WriterException {
-    format = BarcodeFormat.QR_CODE;
-    Bundle bundle = intent.getExtras();
-    if (bundle == null) {
-      throw new WriterException("No extras");
-    }
-    Uri uri = bundle.getParcelable(Intent.EXTRA_STREAM);
-    if (uri == null) {
-      throw new WriterException("No EXTRA_STREAM");
-    }
-    byte[] vcard;
-    String vcardString;
-    InputStream stream = null;
-    try {
-      stream = activity.getContentResolver().openInputStream(uri);
-      if (stream == null) {
-        throw new WriterException("Can't open stream for " + uri);
-      }
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      byte[] buffer = new byte[2048];
-      int bytesRead;
-      while ((bytesRead = stream.read(buffer)) > 0) {
-        baos.write(buffer, 0, bytesRead);
-      }
-      vcard = baos.toByteArray();
-      vcardString = new String(vcard, 0, vcard.length, "UTF-8");
-    } catch (IOException ioe) {
-      throw new WriterException(ioe);
-    } finally {
-      if (stream != null) {
-        try {
-          stream.close();
-        } catch (IOException e) {
-          // continue
-        }
-      }
-    }
-    Log.d(TAG, "Encoding share intent content:");
-    Log.d(TAG, vcardString);
-    Result result = new Result(vcardString, vcard, null, BarcodeFormat.QR_CODE);
-    ParsedResult parsedResult = ResultParser.parseResult(result);
-    if (!(parsedResult instanceof AddressBookParsedResult)) {
-      throw new WriterException("Result was not an address");
-    }
-    encodeQRCodeContents((AddressBookParsedResult) parsedResult);
-    if (contents == null || contents.isEmpty()) {
-      throw new WriterException("No content to encode");
-    }
   }
 
   private void encodeQRCodeContents(Intent intent, String type) {
@@ -324,23 +259,23 @@ final class QRCodeEncoder {
     return values;
   }
 
-  private void encodeQRCodeContents(AddressBookParsedResult contact) {
-    ContactEncoder encoder = useVCard ? new VCardContactEncoder() : new MECARDContactEncoder();
-    String[] encoded = encoder.encode(toList(contact.getNames()),
-                                      contact.getOrg(),
-                                      toList(contact.getAddresses()),
-                                      toList(contact.getPhoneNumbers()),
-                                      null,
-                                      toList(contact.getEmails()),
-                                      toList(contact.getURLs()),
-                                      null);
-    // Make sure we've encoded at least one field.
-    if (!encoded[1].isEmpty()) {
-      contents = encoded[0];
-      displayContents = encoded[1];
-      title = activity.getString(R.string.contents_contact);
-    }
-  }
+//  private void encodeQRCodeContents(AddressBookParsedResult contact) {
+//    ContactEncoder encoder = useVCard ? new VCardContactEncoder() : new MECARDContactEncoder();
+//    String[] encoded = encoder.encode(toList(contact.getNames()),
+//                                      contact.getOrg(),
+//                                      toList(contact.getAddresses()),
+//                                      toList(contact.getPhoneNumbers()),
+//                                      null,
+//                                      toList(contact.getEmails()),
+//                                      toList(contact.getURLs()),
+//                                      null);
+//    // Make sure we've encoded at least one field.
+//    if (!encoded[1].isEmpty()) {
+//      contents = encoded[0];
+//      displayContents = encoded[1];
+//      title = activity.getString(R.string.contents_contact);
+//    }
+//  }
 
   private static List<String> toList(String[] values) {
     return values == null ? null : Arrays.asList(values);
