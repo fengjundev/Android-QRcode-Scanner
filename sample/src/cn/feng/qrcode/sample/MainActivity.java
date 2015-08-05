@@ -10,9 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import cn.feng.qrcode_demo.R;
 
-import com.google.zxing.client.android.CaptureActivity;
-import com.google.zxing.client.android.QRcodeIntents;
-import com.google.zxing.client.android.toolbox.QrcodeUtils;
+import com.feng.qrcode.QRcodeIntents;
+import com.feng.qrcode.capture.CaptureActivity;
+import com.feng.qrcode.toolbox.QrcodeUtils;
 
 public class MainActivity extends Activity {
 
@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		final EditText ed = (EditText) findViewById(R.id.editText1);
-		ed.setText("https://www.google.com/");
+		ed.setText("http://qm.qq.com/cgi-bin/qm/qr?k=cMew98791sdfsjk12390dj-");
 		findViewById(R.id.scan_btn).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
