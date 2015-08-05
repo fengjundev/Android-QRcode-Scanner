@@ -173,6 +173,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       SurfaceHolder surfaceHolder = surfaceView.getHolder();
       surfaceHolder.removeCallback(this);
     }
+    viewfinderView.destroy();
     super.onPause();
   }
 
